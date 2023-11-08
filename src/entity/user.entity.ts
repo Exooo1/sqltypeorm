@@ -1,5 +1,15 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from "typeorm";
 import { CountryEntity } from "./country.entity";
+import {MetadataUser} from "./metadaUser.entity";
 
 @Entity({ name: "users" })
 export class UserEntity {
@@ -20,4 +30,8 @@ export class UserEntity {
 
   @ManyToOne(() => CountryEntity, (country) => country.users)
   country?: CountryEntity;
+
+  @OneToOne(() => MetadataUser)
+  @JoinColumn()
+  metadata: any
 }

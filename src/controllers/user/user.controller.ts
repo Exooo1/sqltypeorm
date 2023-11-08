@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
-import { SetUserDTO } from "./user.dto";
+import {SetUserDTO, SetUserMetadataDTO} from "./user.dto";
 import { UserService } from "./user.service";
 
 @Controller("user")
@@ -14,6 +14,7 @@ export class UserController {
 
   @Post("add-user")
   newUser(@Body() data: SetUserDTO) {
+    console.log('here!')
     return this.userService.newUser(data);
   }
 
@@ -46,6 +47,11 @@ export class UserController {
   @Delete("delete/:id")
   deleteUser(@Param("id") id) {
     return this.userService.deleteUser(id);
+  }
+
+  @Post("user-metadata")
+  userMetadata(@Body() data:SetUserMetadataDTO){
+    return this.userService.userMetadata(data)
   }
 
 }

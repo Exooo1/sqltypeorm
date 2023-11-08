@@ -15,7 +15,7 @@ async function bootstrap() {
       // transform:true преобразует отправляемый тип в указанный тип в DTO
     })
   );
-  await app.listen(3000);
+  await app.listen(9090);
 }
 
 bootstrap();

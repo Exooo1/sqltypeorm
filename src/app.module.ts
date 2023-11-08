@@ -1,15 +1,20 @@
-import { Module } from "@nestjs/common";
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
-import { ConfigModule, ConfigService } from "@nestjs/config";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { UserEntity } from "./entity/user.entity";
-import { CountryEntity } from "./entity/country.entity";
-import { UserModule } from "./controllers/user/user.module";
-import { CountryModule } from "./controllers/country/country.module";
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserEntity } from './entity/user.entity';
+import { CountryEntity } from './entity/country.entity';
+import { UserModule } from './controllers/user/user.module';
+import { CountryModule } from './controllers/country/country.module';
+import { MetadataUser } from './entity/metadaUser.entity';
+import { MetadataUserModule } from './metadata-user/metadata-user.module';
 
 @Module({
-  imports: [CountryModule,UserModule,ConfigModule.forRoot({ isGlobal: true }),
+  imports: [
+    CountryModule,
+    UserModule,
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
@@ -19,13 +24,14 @@ import { CountryModule } from "./controllers/country/country.module";
         username: config.get('DB_USER'),
         password: config.get('DB_PASSWORD'),
         database: config.get('DB_NAME'),
-        entities: [UserEntity,CountryEntity],
+        entities: [UserEntity, CountryEntity, MetadataUser],
         synchronize: true,
       }),
-      inject:[ConfigService],
-    })],
+      inject: [ConfigService],
+    }),
+    MetadataUserModule,
+  ],
   controllers: [AppController],
-  providers: [AppService]
+  providers: [AppService],
 })
-export class AppModule {
-}
+export class AppModule {}

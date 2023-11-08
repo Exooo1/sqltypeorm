@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString, MinLength } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString, MinLength } from 'class-validator';
 
 export class SetUserDTO {
   @MinLength(4)
@@ -12,4 +12,10 @@ export class SetUserDTO {
   readonly lastName: string;
 
   readonly countryId?: number | undefined;
+}
+
+export class SetUserMetadataDTO extends SetUserDTO {
+  age: number;
+  city: string;
+  weight: number;
 }

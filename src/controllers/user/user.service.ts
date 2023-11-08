@@ -1,23 +1,24 @@
-import { Injectable } from "@nestjs/common";
-import { SetUserDTO } from "./user.dto";
-import { InjectRepository } from "@nestjs/typeorm";
-import { FindOptionsWhere, LessThan, Repository } from "typeorm";
-import { UserEntity } from "../../entity/user.entity";
-import { CountryEntity } from "../../entity/country.entity";
+import { Injectable } from '@nestjs/common';
+import { SetUserDTO, SetUserMetadataDTO } from './user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { FindOptionsWhere, LessThan, Repository } from 'typeorm';
+import { UserEntity } from '../../entity/user.entity';
+import { CountryEntity } from '../../entity/country.entity';
+import { MetadataUser } from '../../entity/metadaUser.entity';
 
 @Injectable()
 export class UserService {
-
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(CountryEntity)
-    private readonly countryRepository: Repository<CountryEntity>
-  ) {
-  }
+    private readonly countryRepository: Repository<CountryEntity>,
+    @InjectRepository(MetadataUser)
+    private readonly metadataRepository: Repository<MetadataUser>,
+  ) {}
 
   getUsers() {
-    return this.userRepository.find({ order: { createdAt: "DESC" } });
+    return this.userRepository.find({ order: { createdAt: 'DESC' } });
   }
 
   async newUser(data: SetUserDTO) {
@@ -29,11 +30,13 @@ export class UserService {
       const where: FindOptionsWhere<UserEntity> = { lastName };
       const whereCountry: FindOptionsWhere<CountryEntity> = {};
       const foundUser = await this.userRepository.findOne({ where });
-      if (foundUser) throw new Error("The similar user!");
+      if (foundUser) throw new Error('The similar user!');
       if (countryId) {
         whereCountry.id = countryId;
-        const country = await this.countryRepository.findOne({ where: whereCountry });
-        if (!country) throw new Error("NotFound Country");
+        const country = await this.countryRepository.findOne({
+          where: whereCountry,
+        });
+        if (!country) throw new Error('NotFound Country');
         newUser.country = country;
       }
       return this.userRepository.save(newUser);
@@ -43,15 +46,16 @@ export class UserService {
   }
 
   async getUserWithCountry() {
-    return this.userRepository.find({ relations: ["country"] });
+    return this.userRepository.find({ relations: ['country', 'metadata'] });
   }
 
   async findAUser(name: string) {
     try {
       const user = await this.userRepository.findOneBy({ firstName: name });
-      if (!user) return {
-        message: "notFound"
-      };
+      if (!user)
+        return {
+          message: 'notFound',
+        };
       return user;
     } catch (err) {
       return err;
@@ -62,23 +66,29 @@ export class UserService {
     const where: FindOptionsWhere<UserEntity> = {
       id: LessThan(id),
       country: {
-        country: "France"
-      }
+        country: 'France',
+      },
     };
-    const user = await this.userRepository.find({ relations: ["country"], where });
-    if (!user) return {
-      message: "notFound"
-    };
+    const user = await this.userRepository.find({
+      relations: ['country'],
+      where,
+    });
+    if (!user)
+      return {
+        message: 'notFound',
+      };
     return user;
   }
 
   async findAndCountUser() {
-    const [items, count] = await this.userRepository.findAndCount({ relations: ["country"] });
+    const [items, count] = await this.userRepository.findAndCount({
+      relations: ['country'],
+    });
     console.log(count);
     return items;
   }
 
-  async updateUserOne(date: { name: string, id: number }) {
+  async updateUserOne(date: { name: string; id: number }) {
     // return await this.userRepository.update({ id: date.id }, { firstName: date.name });
     // or
     const user = await this.userRepository.findOneBy({ id: date.id });
@@ -93,10 +103,17 @@ export class UserService {
     // return await this.userRepository.delete({ id: user });
     //or
     const user = await this.userRepository.findOneBy({ id: userId });
-    if(user) {
-      return await this.userRepository.remove(user)
+    if (user) {
+      return await this.userRepository.remove(user);
     }
-    return  []
+    return [];
   }
 
+  async userMetadata(data: SetUserMetadataDTO) {
+    const { lastName, firstName } = data;
+    const { age, city, weight } = data;
+    const metadata = await this.metadataRepository.save({ age, city, weight });
+    await this.userRepository.save({ firstName, lastName, metadata });
+    return 'good';
+  }
 }
