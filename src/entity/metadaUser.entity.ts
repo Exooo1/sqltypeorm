@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {CountryEntity} from "./country.entity";
 
 @Entity({ name: 'metadata-user' })
 export class MetadataUser {
@@ -13,4 +14,8 @@ export class MetadataUser {
 
   @Column('int')
   weight: number;
+
+  @OneToOne(() => CountryEntity, (country) => country.metadata)
+  @JoinColumn()
+  country?: any;
 }

@@ -53,5 +53,4 @@ export class UserController {
   userMetadata(@Body() data:SetUserMetadataDTO){
     return this.userService.userMetadata(data)
   }
-
 }

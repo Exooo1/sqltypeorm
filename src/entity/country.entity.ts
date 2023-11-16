@@ -1,7 +1,16 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { UserEntity } from "./user.entity";
+import {
+  Column,
+  CreateDateColumn,
+  Entity, JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { UserEntity } from './user.entity';
+import { MetadataUser } from './metadaUser.entity';
 
-@Entity({ name: "countries" })
+@Entity({ name: 'countries' })
 export class CountryEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -10,11 +19,15 @@ export class CountryEntity {
   country: string;
 
   @OneToMany(() => UserEntity, (user) => user.country)
-  users: UserEntity[];
+  users?: UserEntity[];
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToOne(() => MetadataUser, (metadata) => metadata.country)
+  @JoinColumn()
+  metadata?: any;
 }

@@ -32,6 +32,7 @@ export class UserService {
       const foundUser = await this.userRepository.findOne({ where });
       if (foundUser) throw new Error('The similar user!');
       if (countryId) {
+        // @ts-ignore
         whereCountry.id = countryId;
         const country = await this.countryRepository.findOne({
           where: whereCountry,
